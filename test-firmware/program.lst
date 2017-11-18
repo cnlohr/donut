@@ -1,0 +1,505 @@
+GAS LISTING /tmp/ccqH8dbA.s 			page 1
+
+
+   1               		.file	"main.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   9               		.text
+  10               	.Ltext0:
+ 108               	.global	__vector_14
+ 110               	__vector_14:
+ 111               		.stabd	46,0,0
+   1:main.c        **** #include <avr/io.h>
+   2:main.c        **** #include <avr/interrupt.h>
+   3:main.c        **** #include <util/delay.h>
+   4:main.c        **** #include <avr/pgmspace.h>
+   5:main.c        **** 
+   6:main.c        **** uint8_t speed;
+   7:main.c        **** register int8_t wave asm("r2");
+   8:main.c        **** ISR( TIMER0_COMPA_vect, ISR_NAKED  )
+   9:main.c        **** {
+ 113               	.LM0:
+ 114               	.LFBB1:
+ 115               	/* prologue: naked */
+ 116               	/* frame size = 0 */
+ 117               	/* stack size = 0 */
+ 118               	.L__stack_usage = 0
+  10:main.c        **** 	if( wave < 0 )
+ 120               	.LM1:
+ 121 0000 27FC      		sbrc r2,7
+ 122 0002 00C0      		rjmp .L2
+  11:main.c        **** 	{
+  12:main.c        **** 		//Switch the inverting rail.  WARNING: Do we need to put the second rail into high impedance mode
+  13:main.c        **** 	}
+  14:main.c        **** 	else
+  15:main.c        **** 	{
+  16:main.c        **** 		//Switch the inverting rail.  WARNING: Do we need to put the second rail into high impedance mode
+  17:main.c        **** 		PORTB &=~_BV(3);
+ 124               	.LM2:
+ 125 0004 2B98      		cbi 0x5,3
+  18:main.c        **** 		PORTD &=~_BV(3);
+ 127               	.LM3:
+ 128 0006 5B98      		cbi 0xb,3
+ 129               	.L2:
+  19:main.c        **** 	}
+  20:main.c        **** 	asm( "reti" );
+ 131               	.LM4:
+ 132               	/* #APP */
+ 133               	 ;  20 "main.c" 1
+ 134 0008 1895      		reti
+ 135               	 ;  0 "" 2
+ 136               	/* epilogue start */
+  21:main.c        **** }
+ 138               	.LM5:
+ 139               	/* #NOAPP */
+ 141               	.Lscope1:
+ 143               		.stabd	78,0,0
+ 145               	.global	__vector_16
+GAS LISTING /tmp/ccqH8dbA.s 			page 2
+
+
+ 147               	__vector_16:
+ 148               		.stabd	46,0,0
+  22:main.c        **** 
+  23:main.c        **** ISR( TIMER0_OVF_vect )
+  24:main.c        **** {
+ 150               	.LM6:
+ 151               	.LFBB2:
+ 152 000a 1F92      		push r1
+ 153 000c 0F92      		push r0
+ 154 000e 0FB6      		in r0,__SREG__
+ 155 0010 0F92      		push r0
+ 156 0012 1124      		clr __zero_reg__
+ 157 0014 2F93      		push r18
+ 158 0016 3F93      		push r19
+ 159 0018 4F93      		push r20
+ 160 001a 5F93      		push r21
+ 161 001c 8F93      		push r24
+ 162 001e 9F93      		push r25
+ 163               	/* prologue: Signal */
+ 164               	/* frame size = 0 */
+ 165               	/* stack size = 9 */
+ 166               	.L__stack_usage = 9
+  25:main.c        **** 	if( wave < 0 )
+ 168               	.LM7:
+ 169 0020 27FE      		sbrs r2,7
+ 170 0022 00C0      		rjmp .L4
+  26:main.c        **** 	{
+  27:main.c        **** 		PORTB |= _BV(3);
+ 172               	.LM8:
+ 173 0024 2B9A      		sbi 0x5,3
+  28:main.c        **** 		PORTD |= _BV(3);
+ 175               	.LM9:
+ 176 0026 5B9A      		sbi 0xb,3
+ 177               	.L4:
+  29:main.c        **** 	}
+  30:main.c        **** 	//Handle TIM0 OVR.  This happens at 31kHz.
+  31:main.c        **** 
+  32:main.c        **** #if 0
+  33:main.c        **** 	int16_t twave;
+  34:main.c        **** 	static int8_t up;
+  35:main.c        **** 	static uint8_t wave;
+  36:main.c        **** 	if( up )
+  37:main.c        **** 	{
+  38:main.c        **** 		wave+=2;
+  39:main.c        **** 		if( wave == 100 ) up = 0;
+  40:main.c        **** 	}
+  41:main.c        **** 	else
+  42:main.c        **** 	{
+  43:main.c        **** 		wave-=2;
+  44:main.c        **** 		if( wave == 0 ) up = 1;
+  45:main.c        **** 	}
+  46:main.c        **** 	OCR0A = OCR0B = wave;
+  47:main.c        **** 		PORTB |= _BV(3);
+  48:main.c        **** 		PORTD |= _BV(3);
+  49:main.c        **** 
+  50:main.c        **** #else
+  51:main.c        **** 	int16_t twave;
+GAS LISTING /tmp/ccqH8dbA.s 			page 3
+
+
+  52:main.c        **** 	static uint8_t up;
+  53:main.c        **** 
+  54:main.c        **** 	if( speed == 0 )
+ 179               	.LM10:
+ 180 0028 8091 0000 		lds r24,speed
+ 181 002c 8111      		cpse r24,__zero_reg__
+ 182 002e 00C0      		rjmp .L5
+  55:main.c        **** 	{
+  56:main.c        **** 		DDRB &=~_BV(3);
+ 184               	.LM11:
+ 185 0030 2398      		cbi 0x4,3
+  57:main.c        **** 		DDRD &=~_BV(3);
+ 187               	.LM12:
+ 188 0032 5398      		cbi 0xa,3
+ 189 0034 00C0      		rjmp .L6
+ 190               	.L5:
+  58:main.c        **** 	}
+  59:main.c        **** 	else
+  60:main.c        **** 	{
+  61:main.c        **** 		DDRB |= _BV(3);
+ 192               	.LM13:
+ 193 0036 239A      		sbi 0x4,3
+  62:main.c        **** 		DDRD |= _BV(3);
+ 195               	.LM14:
+ 196 0038 539A      		sbi 0xa,3
+ 197               	.L6:
+  63:main.c        **** 
+  64:main.c        **** 	}
+  65:main.c        **** 
+  66:main.c        **** 	twave = wave;
+ 199               	.LM15:
+ 200 003a 822D      		mov r24,r2
+ 201 003c 082E      		mov __tmp_reg__,r24
+ 202 003e 000C      		lsl r0
+ 203 0040 990B      		sbc r25,r25
+  67:main.c        **** 	if( up )
+ 205               	.LM16:
+ 206 0042 3091 0000 		lds r19,up.1812
+ 207 0046 2091 0000 		lds r18,speed
+ 208 004a 3323      		tst r19
+ 209 004c 01F0      		breq .L7
+  68:main.c        **** 	{
+  69:main.c        **** 		twave+=speed;
+ 211               	.LM17:
+ 212 004e 820F      		add r24,r18
+ 213 0050 911D      		adc r25,__zero_reg__
+  70:main.c        **** 		if( twave > 100 ) { up = 0; twave = 100 - (twave-100); } //I hope this is right.
+ 215               	.LM18:
+ 216 0052 8536      		cpi r24,101
+ 217 0054 9105      		cpc r25,__zero_reg__
+ 218 0056 04F0      		brlt .L8
+ 220               	.LM19:
+ 221 0058 1092 0000 		sts up.1812,__zero_reg__
+ 222 005c 28EC      		ldi r18,lo8(-56)
+ 223 005e 30E0      		ldi r19,0
+ 224 0060 00C0      		rjmp .L9
+ 225               	.L7:
+GAS LISTING /tmp/ccqH8dbA.s 			page 4
+
+
+  71:main.c        **** 	}
+  72:main.c        **** 	else
+  73:main.c        **** 	{
+  74:main.c        **** 		twave-=speed;
+ 227               	.LM20:
+ 228 0062 821B      		sub r24,r18
+ 229 0064 9109      		sbc r25,__zero_reg__
+  75:main.c        **** 		if( twave < -100 ) { up = 1; twave = -100 - (twave+100); } //I hope this is right.
+ 231               	.LM21:
+ 232 0066 8C39      		cpi r24,-100
+ 233 0068 5FEF      		ldi r21,-1
+ 234 006a 9507      		cpc r25,r21
+ 235 006c 04F4      		brge .L8
+ 237               	.LM22:
+ 238 006e 21E0      		ldi r18,lo8(1)
+ 239 0070 2093 0000 		sts up.1812,r18
+ 240 0074 28E3      		ldi r18,lo8(56)
+ 241 0076 3FEF      		ldi r19,lo8(-1)
+ 242               	.L9:
+ 243 0078 A901      		movw r20,r18
+ 244 007a 481B      		sub r20,r24
+ 245 007c 590B      		sbc r21,r25
+ 246 007e CA01      		movw r24,r20
+ 247               	.L8:
+  76:main.c        **** 	}
+  77:main.c        **** 	wave = twave;
+ 249               	.LM23:
+ 250 0080 282E      		mov r2,r24
+  78:main.c        **** 
+  79:main.c        **** //	if( wave > 0 )
+  80:main.c        **** //		TIFR0 |= _BV(OCF0A);
+  81:main.c        **** 	OCR0A = OCR0B = ( ((uint8_t)wave)<<1);
+ 252               	.LM24:
+ 253 0082 880F      		lsl r24
+ 254 0084 88BD      		out 0x28,r24
+ 255 0086 87BD      		out 0x27,r24
+  82:main.c        **** 
+  83:main.c        **** 	sei();
+ 257               	.LM25:
+ 258               	/* #APP */
+ 259               	 ;  83 "main.c" 1
+ 260 0088 7894      		sei
+ 261               	 ;  0 "" 2
+ 262               	/* epilogue start */
+  84:main.c        **** 
+  85:main.c        **** #endif
+  86:main.c        **** }
+ 264               	.LM26:
+ 265               	/* #NOAPP */
+ 266 008a 9F91      		pop r25
+ 267 008c 8F91      		pop r24
+ 268 008e 5F91      		pop r21
+ 269 0090 4F91      		pop r20
+ 270 0092 3F91      		pop r19
+ 271 0094 2F91      		pop r18
+ 272 0096 0F90      		pop r0
+ 273 0098 0FBE      		out __SREG__,r0
+GAS LISTING /tmp/ccqH8dbA.s 			page 5
+
+
+ 274 009a 0F90      		pop r0
+ 275 009c 1F90      		pop r1
+ 276 009e 1895      		reti
+ 281               	.Lscope2:
+ 283               		.stabd	78,0,0
+ 284               		.section	.text.startup,"ax",@progbits
+ 286               	.global	main
+ 288               	main:
+ 289               		.stabd	46,0,0
+  87:main.c        **** 
+  88:main.c        **** 
+  89:main.c        **** int main()
+  90:main.c        **** {
+ 291               	.LM27:
+ 292               	.LFBB3:
+ 293               	/* prologue: function */
+ 294               	/* frame size = 0 */
+ 295               	/* stack size = 0 */
+ 296               	.L__stack_usage = 0
+  91:main.c        **** 	CLKPR=0x80;
+ 298               	.LM28:
+ 299 0000 80E8      		ldi r24,lo8(-128)
+ 300 0002 8093 6100 		sts 97,r24
+  92:main.c        **** 	CLKPR=0x01;
+ 302               	.LM29:
+ 303 0006 81E0      		ldi r24,lo8(1)
+ 304 0008 8093 6100 		sts 97,r24
+  93:main.c        **** 
+  94:main.c        **** 	//Set outputs to be: Speaker and TX light.
+  95:main.c        **** 	DDRD = (_BV(3) | _BV(5) | _BV(6) | _BV(1) );
+ 306               	.LM30:
+ 307 000c 9AE6      		ldi r25,lo8(106)
+ 308 000e 9AB9      		out 0xa,r25
+  96:main.c        **** 	DDRB = _BV(3);
+ 310               	.LM31:
+ 311 0010 98E0      		ldi r25,lo8(8)
+ 312 0012 94B9      		out 0x4,r25
+  97:main.c        **** 
+  98:main.c        **** 	DDRD &= ~_BV(6);
+ 314               	.LM32:
+ 315 0014 5698      		cbi 0xa,6
+  99:main.c        **** 
+ 100:main.c        **** 	TCCR0A = _BV(COM0A1) | _BV(COM0B1) | _BV(WGM01) | _BV(WGM00); //Phase correct PWM on TCCR0A, Clear
+ 317               	.LM33:
+ 318 0016 93EA      		ldi r25,lo8(-93)
+ 319 0018 94BD      		out 0x24,r25
+ 101:main.c        **** 	TCCR0B = _BV(CS00);
+ 321               	.LM34:
+ 322 001a 85BD      		out 0x25,r24
+ 102:main.c        **** 	TIMSK0 |= _BV(TOIE0) | _BV(OCIE0A);
+ 324               	.LM35:
+ 325 001c 8091 6E00 		lds r24,110
+ 326 0020 8360      		ori r24,lo8(3)
+ 327 0022 8093 6E00 		sts 110,r24
+ 103:main.c        **** 	sei();
+ 329               	.LM36:
+ 330               	/* #APP */
+GAS LISTING /tmp/ccqH8dbA.s 			page 6
+
+
+ 331               	 ;  103 "main.c" 1
+ 332 0026 7894      		sei
+ 333               	 ;  0 "" 2
+ 104:main.c        **** 
+ 105:main.c        **** 
+ 106:main.c        **** 	PORTB |= _BV(0) | _BV(1) | _BV(4) | _BV(5);
+ 335               	.LM37:
+ 336               	/* #NOAPP */
+ 337 0028 85B1      		in r24,0x5
+ 338 002a 8363      		ori r24,lo8(51)
+ 339 002c 85B9      		out 0x5,r24
+ 107:main.c        **** 	PORTC |= 0x3f;
+ 341               	.LM38:
+ 342 002e 88B1      		in r24,0x8
+ 343 0030 8F63      		ori r24,lo8(63)
+ 344 0032 88B9      		out 0x8,r24
+ 108:main.c        **** 	PORTD |= _BV(0) | _BV(2) | _BV(4) | _BV(7);
+ 346               	.LM39:
+ 347 0034 8BB1      		in r24,0xb
+ 348 0036 8569      		ori r24,lo8(-107)
+ 349 0038 8BB9      		out 0xb,r24
+ 109:main.c        **** 	PORTE |= _BV(3) | _BV(2) | _BV(1);
+ 351               	.LM40:
+ 352 003a 8EB1      		in r24,0xe
+ 353 003c 8E60      		ori r24,lo8(14)
+ 354 003e 8EB9      		out 0xe,r24
+ 355               	.L31:
+ 356               	.LBB2:
+ 110:main.c        **** 
+ 111:main.c        **** 	while(1)
+ 112:main.c        **** 	{
+ 113:main.c        **** 		uint8_t ts = 0;
+ 114:main.c        **** 		uint8_t i;
+ 115:main.c        **** 		i = PINB;
+ 358               	.LM41:
+ 359 0040 93B1      		in r25,0x3
+ 116:main.c        **** 		if( !( i & _BV(0) ) ) ts = 2;
+ 361               	.LM42:
+ 362 0042 90FD      		sbrc r25,0
+ 363 0044 00C0      		rjmp .L32
+ 364 0046 82E0      		ldi r24,lo8(2)
+ 365 0048 00C0      		rjmp .L12
+ 366               	.L32:
+ 113:main.c        **** 		uint8_t i;
+ 368               	.LM43:
+ 369 004a 80E0      		ldi r24,0
+ 370               	.L12:
+ 117:main.c        **** 		if( !( i & _BV(1) ) ) ts = 3;
+ 372               	.LM44:
+ 373 004c 91FF      		sbrs r25,1
+ 374 004e 83E0      		ldi r24,lo8(3)
+ 375               	.L13:
+ 118:main.c        **** 		if( !( i & _BV(4) ) ) ts = 4; //SUSPECT
+ 377               	.LM45:
+ 378 0050 94FF      		sbrs r25,4
+ 379 0052 84E0      		ldi r24,lo8(4)
+ 380               	.L14:
+GAS LISTING /tmp/ccqH8dbA.s 			page 7
+
+
+ 119:main.c        **** 		if( !( i & _BV(5) ) ) ts = 16;
+ 382               	.LM46:
+ 383 0054 95FF      		sbrs r25,5
+ 384 0056 80E1      		ldi r24,lo8(16)
+ 385               	.L15:
+ 120:main.c        **** 		i = PINC;
+ 387               	.LM47:
+ 388 0058 96B1      		in r25,0x6
+ 121:main.c        **** 		if( !( i & _BV(0) ) ) ts = 5;
+ 390               	.LM48:
+ 391 005a 90FF      		sbrs r25,0
+ 392 005c 85E0      		ldi r24,lo8(5)
+ 393               	.L16:
+ 122:main.c        **** 		if( !( i & _BV(1) ) ) ts = 6;
+ 395               	.LM49:
+ 396 005e 91FF      		sbrs r25,1
+ 397 0060 86E0      		ldi r24,lo8(6)
+ 398               	.L17:
+ 123:main.c        **** 		if( !( i & _BV(2) ) ) ts = 17; // /SUSPECT
+ 400               	.LM50:
+ 401 0062 92FF      		sbrs r25,2
+ 402 0064 81E1      		ldi r24,lo8(17)
+ 403               	.L18:
+ 124:main.c        **** 		if( !( i & _BV(3) ) ) ts = 8; // /SUSPECT
+ 405               	.LM51:
+ 406 0066 93FF      		sbrs r25,3
+ 407 0068 88E0      		ldi r24,lo8(8)
+ 408               	.L19:
+ 125:main.c        **** 		if( !( i & _BV(5) ) ) ts = 9;
+ 410               	.LM52:
+ 411 006a 95FF      		sbrs r25,5
+ 412 006c 89E0      		ldi r24,lo8(9)
+ 413               	.L20:
+ 126:main.c        **** 		if( !( i & _BV(4) ) ) ts = 16;
+ 415               	.LM53:
+ 416 006e 94FF      		sbrs r25,4
+ 417 0070 80E1      		ldi r24,lo8(16)
+ 418               	.L21:
+ 127:main.c        **** 		i = PIND;
+ 420               	.LM54:
+ 421 0072 99B1      		in r25,0x9
+ 128:main.c        **** 		if( !( i & _BV(0) ) ) ts = 10;
+ 423               	.LM55:
+ 424 0074 90FF      		sbrs r25,0
+ 425 0076 8AE0      		ldi r24,lo8(10)
+ 426               	.L22:
+ 129:main.c        **** 		if( !( i & _BV(2) ) ) ts = 11;
+ 428               	.LM56:
+ 429 0078 92FF      		sbrs r25,2
+ 430 007a 8BE0      		ldi r24,lo8(11)
+ 431               	.L23:
+ 130:main.c        **** 		if( !( i & _BV(4) ) ) ts = 12;
+ 433               	.LM57:
+ 434 007c 94FF      		sbrs r25,4
+ 435 007e 8CE0      		ldi r24,lo8(12)
+ 436               	.L24:
+ 131:main.c        **** 		if( !( i & _BV(7) ) ) ts = 13;
+GAS LISTING /tmp/ccqH8dbA.s 			page 8
+
+
+ 438               	.LM58:
+ 439 0080 97FF      		sbrs r25,7
+ 440 0082 8DE0      		ldi r24,lo8(13)
+ 441               	.L25:
+ 132:main.c        **** 		i = PINE;
+ 443               	.LM59:
+ 444 0084 9CB1      		in r25,0xc
+ 133:main.c        **** 		if( !( i & _BV(1) ) ) ts = 18;
+ 446               	.LM60:
+ 447 0086 91FF      		sbrs r25,1
+ 448 0088 82E1      		ldi r24,lo8(18)
+ 449               	.L26:
+ 134:main.c        **** 		if( !( i & _BV(2) ) ) ts = 14;
+ 451               	.LM61:
+ 452 008a 92FF      		sbrs r25,2
+ 453 008c 8EE0      		ldi r24,lo8(14)
+ 454               	.L27:
+ 135:main.c        **** 		if( !( i & _BV(3) ) ) ts = 15;
+ 456               	.LM62:
+ 457 008e 93FF      		sbrs r25,3
+ 458 0090 00C0      		rjmp .L33
+ 136:main.c        **** 		if( ts != 0 )
+ 460               	.LM63:
+ 461 0092 8823      		tst r24
+ 462 0094 01F0      		breq .L29
+ 463 0096 00C0      		rjmp .L28
+ 464               	.L33:
+ 135:main.c        **** 		if( !( i & _BV(3) ) ) ts = 15;
+ 466               	.LM64:
+ 467 0098 8FE0      		ldi r24,lo8(15)
+ 468               	.L28:
+ 137:main.c        **** 		{
+ 138:main.c        **** 			PORTD &=~_BV(1); //LED
+ 470               	.LM65:
+ 471 009a 5998      		cbi 0xb,1
+ 472 009c 00C0      		rjmp .L30
+ 473               	.L29:
+ 139:main.c        **** 		}
+ 140:main.c        **** 		else
+ 141:main.c        **** 		{
+ 142:main.c        **** 			PORTD |= _BV(1); //LED
+ 475               	.LM66:
+ 476 009e 599A      		sbi 0xb,1
+ 477               	.L30:
+ 143:main.c        **** 		}
+ 144:main.c        **** 		speed = ts;
+ 479               	.LM67:
+ 480 00a0 8093 0000 		sts speed,r24
+ 481               	.LBE2:
+ 145:main.c        **** 	}
+ 483               	.LM68:
+ 484 00a4 00C0      		rjmp .L31
+ 489               	.Lscope3:
+ 491               		.stabd	78,0,0
+ 492               		.local	up.1812
+ 493               		.comm	up.1812,1,1
+ 494               		.comm	speed,1,1
+GAS LISTING /tmp/ccqH8dbA.s 			page 9
+
+
+ 497               		.text
+ 499               	.Letext0:
+ 500               		.ident	"GCC: (GNU) 4.9.2"
+ 501               	.global __do_clear_bss
+GAS LISTING /tmp/ccqH8dbA.s 			page 10
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 main.c
+     /tmp/ccqH8dbA.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/ccqH8dbA.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/ccqH8dbA.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/ccqH8dbA.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/ccqH8dbA.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/ccqH8dbA.s:110    .text:0000000000000000 __vector_14
+     /tmp/ccqH8dbA.s:147    .text:000000000000000a __vector_16
+                            *COM*:0000000000000001 speed
+                             .bss:0000000000000000 up.1812
+     /tmp/ccqH8dbA.s:288    .text.startup:0000000000000000 main
+
+UNDEFINED SYMBOLS
+__do_clear_bss
