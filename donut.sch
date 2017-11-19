@@ -1091,12 +1091,12 @@ SCK
 $Comp
 L Conn_01x03 J2
 U 1 1 59F70F6D
-P 5950 2900
-F 0 "J2" H 5950 3100 50  0000 C CNN
-F 1 "Jack" H 5950 2700 50  0000 C CNN
-F 2 "3.5mm_barrel_jack_MJ-3536N" H 5950 2900 50  0001 C CNN
-F 3 "" H 5950 2900 50  0001 C CNN
-	1    5950 2900
+P 6100 3000
+F 0 "J2" H 6100 3200 50  0000 C CNN
+F 1 "Jack" H 6100 2800 50  0000 C CNN
+F 2 "3.5mm_barrel_jack_MJ-3536N" H 6100 3000 50  0001 C CNN
+F 3 "" H 6100 3000 50  0001 C CNN
+	1    6100 3000
 	1    0    0    -1  
 $EndComp
 Text Notes 4800 4350 2    60   ~ 0
@@ -1172,50 +1172,12 @@ F 3 "" H 5200 4150 50  0001 C CNN
 	1    5200 4150
 	0    1    1    0   
 $EndComp
-Text GLabel 5550 2550 0    60   Input ~ 0
-AUD-SW
-Text GLabel 5750 2800 0    60   Input ~ 0
-AUD-
 Text GLabel 4900 2200 0    60   Input ~ 0
 MOSI
 Text GLabel 5000 2200 2    60   Input ~ 0
 AUD-
 Text GLabel 4100 3100 2    60   Input ~ 0
 AUD-
-Wire Wire Line
-	4600 1400 4600 1800
-Wire Wire Line
-	4600 1800 4100 1800
-Wire Wire Line
-	5050 1400 4600 1400
-Wire Wire Line
-	4900 1550 5750 1550
-Wire Wire Line
-	5650 1550 5650 1400
-Wire Wire Line
-	5300 1700 5400 1700
-Wire Wire Line
-	4900 1350 4900 1400
-Connection ~ 4900 1400
-Wire Wire Line
-	5750 1550 5750 1350
-Connection ~ 5650 1550
-Wire Wire Line
-	5350 1750 5350 1700
-Connection ~ 5350 1700
-Wire Wire Line
-	5300 4700 5350 4700
-Wire Wire Line
-	5300 4450 5350 4450
-Wire Wire Line
-	5550 2900 5550 3050
-Connection ~ 5550 3000
-Wire Wire Line
-	5750 2900 5550 2900
-Wire Wire Line
-	5400 3000 5550 3000
-Wire Wire Line
-	4900 2200 5000 2200
 Text GLabel 5300 4450 0    60   Input ~ 0
 TX
 $Comp
@@ -1262,10 +1224,6 @@ F 3 "" H 6700 600 50  0001 C CNN
 	1    6700 600 
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	4900 1900 4900 1550
-Wire Wire Line
-	4100 1900 4900 1900
 $Comp
 L TACTILE SW14
 U 1 1 59F81648
@@ -1520,13 +1478,6 @@ F 3 "" H 5050 6000 50  0001 C CNN
 	1    5050 6000
 	0    1    1    0   
 $EndComp
-Wire Wire Line
-	3450 4850 3350 4850
-Wire Wire Line
-	3400 4850 3400 5050
-Wire Wire Line
-	3400 5050 3450 5050
-Connection ~ 3400 4850
 $Comp
 L LED D1
 U 1 1 5A00A8D3
@@ -1573,10 +1524,6 @@ F 3 "" H 1700 5550 50  0001 C CNN
 $EndComp
 Text GLabel 1500 5550 0    60   Input ~ 0
 TX
-Wire Wire Line
-	1500 5550 1550 5550
-Wire Wire Line
-	1500 5300 1550 5300
 Text GLabel 1500 5300 0    60   Input ~ 0
 TX
 $Comp
@@ -1657,12 +1604,63 @@ Text GLabel 5900 5750 2    60   Input ~ 0
 TOUCH2
 Text GLabel 5900 5650 2    60   Input ~ 0
 TOUCH1
-Wire Wire Line
-	5050 2350 4950 2350
 Text GLabel 5550 3350 3    60   Input ~ 0
 AUD-
-Text GLabel 5750 3000 3    60   Input ~ 0
-AUD-SW
+Text GLabel 5900 3000 0    60   Input ~ 0
+AUD-
 Wire Wire Line
-	5550 2550 5800 2550
+	4600 1400 4600 1800
+Wire Wire Line
+	4600 1800 4100 1800
+Wire Wire Line
+	5050 1400 4600 1400
+Wire Wire Line
+	4900 1550 5750 1550
+Wire Wire Line
+	5650 1550 5650 1400
+Wire Wire Line
+	5300 1700 5400 1700
+Wire Wire Line
+	4900 1350 4900 1400
+Connection ~ 4900 1400
+Wire Wire Line
+	5750 1550 5750 1350
+Connection ~ 5650 1550
+Wire Wire Line
+	5350 1750 5350 1700
+Connection ~ 5350 1700
+Wire Wire Line
+	5300 4700 5350 4700
+Wire Wire Line
+	5300 4450 5350 4450
+Wire Wire Line
+	5550 2900 5550 3050
+Connection ~ 5550 3000
+Wire Wire Line
+	5550 2900 5900 2900
+Wire Wire Line
+	5400 3000 5550 3000
+Wire Wire Line
+	4900 2200 5000 2200
+Wire Wire Line
+	4900 1900 4900 1550
+Wire Wire Line
+	4100 1900 4900 1900
+Wire Wire Line
+	3450 4850 3350 4850
+Wire Wire Line
+	3400 4850 3400 5050
+Wire Wire Line
+	3400 5050 3450 5050
+Connection ~ 3400 4850
+Wire Wire Line
+	1500 5550 1550 5550
+Wire Wire Line
+	1500 5300 1550 5300
+Wire Wire Line
+	5050 2350 4950 2350
+Text GLabel 5800 2550 0    60   Input ~ 0
+AUD-SM
+Text GLabel 5900 3100 3    60   Input ~ 0
+AUD-SM
 $EndSCHEMATC
