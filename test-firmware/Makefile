@@ -12,7 +12,7 @@ samples.c : sampleenc
 sampleenc : sampleenc.c
 	gcc -o $@ $^
 
-program.elf : main.c samples.c
+program.elf : main.c util.c
 	avr-gcc -I -mmcu=$(PROCESSOR) $(CFLAGS) -Wl,-Map,program.map -o $@ $^ -L /usr/lib64/binutils/avr/2.19.1
 
 program.hex : program.elf
