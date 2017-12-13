@@ -5,8 +5,8 @@
 #include <avr/pgmspace.h>
 
 register int8_t wave asm("r2");
-uint8_t (*voiceptr)();
-uint8_t speed;
+uint8_t (* volatile voiceptr)();
+volatile uint8_t speed;
 
 //https://stackoverflow.com/questions/1558321/how-do-i-generate-random-numbers-in-a-microcontroller-efficiently
 
@@ -60,39 +60,47 @@ ISR( TIMER0_OVF_vect )
 			return;
 	}
 
-#if 0
-	if( audmark )
-	{
-		wave = pgm_read_byte( &auddat[sampleCount>>2] );
-		DDRB |= _BV(3);
-		DDRD |= _BV(3);
-		if( sampleCount == 32000 ) audmark = 0;
-	}
-	else
-	{
-	}
-#endif
-
-//	if( wave > 0 )
-//		TIFR0 |= _BV(OCF0A);
-
-
-	//Tricky: 
+	//Tricky: Need to almost immediately switch the value.
 	OCR0A = OCR0B = ( ((uint8_t)wave)<<1);
 	sei();
 
 }
 
 
+#define HAS_SAMPLES
 
+#ifdef HAS_SAMPLES
+const extern int8_t PROGMEM auddat[7981];
+uint8_t voicePlayWave()
+{
+	static uint16_t sampleCount = 0;
+	wave = pgm_read_byte( &auddat[sampleCount>>2] );
+	if( sampleCount == 32000 )
+	{
+		voiceptr = voiceQuicklySleep;
+		sampleCount = 0;
+	}
+	sampleCount++;
+	return 1;
+}
+#else
+uint8_t voicePlayWave()
+{
+	voiceptr = voiceQuicklySleep;
+}
 
-
-
+#endif
 
 uint8_t voiceDoBasicSynth()
 {
 	int16_t twave;
 	static uint8_t up;
+	if( !speed )
+	{
+		voiceptr = voiceQuicklySleep;
+		return 0;
+	}
+
 	twave = wave;
 	if( up )
 	{
@@ -105,6 +113,7 @@ uint8_t voiceDoBasicSynth()
 		if( twave < -100 ) { up = 1; twave = -100 - (twave+100); } //I hope this is right.
 	}
 	wave = twave;
+	return 1;
 }
 
 

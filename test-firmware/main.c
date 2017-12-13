@@ -30,14 +30,14 @@ int main()
 	PORTD |= _BV(0) | _BV(2) | _BV(4) | _BV(7);
 	PORTE |= _BV(3) | _BV(2) | _BV(1);
 
-	voiceptr = &voiceDoBasicSynth;
+
 
 	while(1)
 	{
 		uint8_t ts = 0;
 		uint8_t i;
 		i = PINB;
-		if( !( i & _BV(0) ) ) ts = 2;
+		if( !( i & _BV(0) ) ) voiceptr = &voicePlayWave;
 		if( !( i & _BV(1) ) ) ts = 3;
 		if( !( i & _BV(4) ) ) ts = 4; //SUSPECT
 		if( !( i & _BV(5) ) ) ts = 16;
@@ -57,14 +57,15 @@ int main()
 		if( !( i & _BV(1) ) ) ts = 18;
 		if( !( i & _BV(2) ) ) ts = 14;
 		if( !( i & _BV(3) ) ) ts = 15;
+		speed = ts;
 		if( ts != 0 )
 		{
+			voiceptr = &voiceDoBasicSynth;
 			PORTD &=~_BV(1); //LED
 		}
 		else
 		{
 			PORTD |= _BV(1); //LED
 		}
-		speed = ts;
 	}
 }
