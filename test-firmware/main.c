@@ -17,6 +17,8 @@ int main()
 	DDRD = (_BV(3) | _BV(5) | _BV(6) | _BV(1) );
 	DDRB = _BV(3);
 
+	voiceptr = &voiceQuicklySleep;
+
 //_BV(COM0A1) |
 //_BV(COM0B1) | 
 	TCCR0A = _BV(COM0B1) | _BV(COM0A1) | _BV(WGM01) | _BV(WGM00); //Phase correct PWM on TCCR0A, Clear on compare match.
@@ -38,41 +40,55 @@ int main()
 
 
 
-
 	while(1)
 	{
 		uint8_t ts = 0;
+		uint8_t ts1 = 0;
+
 		uint8_t i;
-		i = PINB;
-		if( !( i & _BV(0) ) ) voiceptr = &voicePlayWave;
-		if( !( i & _BV(1) ) ) ts = 3;
-		if( !( i & _BV(4) ) ) ts = 4; //SUSPECT
-		if( !( i & _BV(5) ) ) ts = 16;
-		i = PINC;
-		if( !( i & _BV(0) ) ) ts = 5;
-		if( !( i & _BV(1) ) ) ts = 6;
-		if( !( i & _BV(2) ) ) ts = 17; // /SUSPECT
-		if( !( i & _BV(3) ) ) ts = 8; // /SUSPECT
-		if( !( i & _BV(5) ) ) ts = 9;
-		if( !( i & _BV(4) ) ) ts = 16;
-		i = PIND;
-		if( !( i & _BV(0) ) ) ts = 10;
-		if( !( i & _BV(2) ) ) ts = 11;
-		if( !( i & _BV(4) ) ) ts = 12;
-		if( !( i & _BV(7) ) ) ts = 13;
-		i = PINE;
-		if( !( i & _BV(1) ) ) ts = 18;
-		if( !( i & _BV(2) ) ) ts = 14;
-		if( !( i & _BV(3) ) ) ts = 15;
-		speed = ts;
+		uint16_t checkmask = 1;
+
+		uint16_t mask = ReadButtonMask();
+
+		for( i = 0; i < 16; i++ )
+		{
+			if( mask & checkmask ) {
+				if( ts ) 
+					ts1 = i+1;
+				else
+					ts = i+1;
+			}
+			checkmask<<=1;
+		}
+
+#define BEND 24
+
 		if( ts != 0 )
 		{
+			speed = freq_s[ts-1+BEND];
+			speed_rec = freq_rs[ts-1+BEND];
+			if( ts1 )
+			{
+				speed1 = freq_s[ts1-1+BEND];
+				speed_rec1 = freq_rs[ts1-1+BEND];
+			}
+			else
+			{
+				speed1 = 0;
+			}
 			voiceptr = &voiceDoBasicSynth;
 			PORTD &=~_BV(1); //LED
 		}
 		else
 		{
+			speed = 0;
 			PORTD |= _BV(1); //LED
 		}
 	}
 }
+
+
+
+
+volatile uint8_t speed1;
+volatile uint8_t speed_rec1;
