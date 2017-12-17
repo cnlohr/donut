@@ -5,6 +5,10 @@ PROCESSOR=atmega168pb
 PROGRAMCODE=m168
 CFLAGS = -Os -mmcu=$(PROCESSOR) -DF_CPU=8000000UL -I. -Iusbdrv
 ASFLAGS = $(CFLAGS) -x assembler-with-cpp
+SRCS :=  main.c util.c 
+
+CFLAGS:=$(CFLAGS) -DHAS_SAMPLES
+SRCS:= $(SRCS) samples.c
 
 samples.c : sampleenc
 	./sampleenc > samples.c
@@ -12,7 +16,7 @@ samples.c : sampleenc
 sampleenc : sampleenc.c
 	gcc -o $@ $^
 
-program.elf : main.c util.c samples.c
+program.elf :$(SRCS)
 	avr-gcc -I -mmcu=$(PROCESSOR) $(CFLAGS) -Wl,-Map,program.map -o $@ $^ -L /usr/lib64/binutils/avr/2.19.1
 
 program.hex : program.elf

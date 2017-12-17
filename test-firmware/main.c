@@ -17,18 +17,25 @@ int main()
 	DDRD = (_BV(3) | _BV(5) | _BV(6) | _BV(1) );
 	DDRB = _BV(3);
 
-	DDRD &= ~_BV(6);
-
-	TCCR0A = _BV(COM0A1) | _BV(COM0B1) | _BV(WGM01) | _BV(WGM00); //Phase correct PWM on TCCR0A, Clear on compare match.
+//_BV(COM0A1) |
+//_BV(COM0B1) | 
+	TCCR0A = _BV(COM0B1) | _BV(COM0A1) | _BV(WGM01) | _BV(WGM00); //Phase correct PWM on TCCR0A, Clear on compare match.
 	TCCR0B = _BV(CS00);
-	TIMSK0 |= _BV(TOIE0) | _BV(OCIE0A);
-	sei();
+	TIMSK0 |= _BV(TOIE0);// | _BV(OCIE0A);
+	OCR0A = OCR0B = 255;
+	//DDRD &= ~_BV(5);
+	//DDRD |= _BV(6);
+	//DDRD &= ~_BV(6);
+
 
 
 	PORTB |= _BV(0) | _BV(1) | _BV(4) | _BV(5);
 	PORTC |= 0x3f;
 	PORTD |= _BV(0) | _BV(2) | _BV(4) | _BV(7);
 	PORTE |= _BV(3) | _BV(2) | _BV(1);
+
+	sei();
+
 
 
 
