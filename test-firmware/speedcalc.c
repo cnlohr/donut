@@ -7,7 +7,7 @@ int main()
 	float f;
 	int note;
 
-#define NUMNOTES 60
+#define NUMNOTES 72 //6 octaves
 	uint8_t freq_s[NUMNOTES];
 	uint8_t freq_rs[NUMNOTES];
 	for( note = 0; note < NUMNOTES; note++ )

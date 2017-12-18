@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-extern uint8_t lfsr; //last value
+extern uint16_t lfsr; //last value
 uint8_t GetRandom();
 
 //extern register int8_t wave asm("r2");
@@ -12,6 +12,13 @@ extern volatile uint8_t speed;  //Use this as the "pitch" or code for your first
 extern volatile uint8_t speed_rec;
 extern volatile uint8_t speed1;  //This is effectively a second voice.  Cannot be used if voice0 is off.
 extern volatile uint8_t speed_rec1;
+extern volatile uint8_t volume;
+extern volatile uint8_t volume1; //Adjust volume.  CAREFUL: If you are playing two notes, the sum of the volume MUST NOT EXCCED 255.
+
+extern volatile uint16_t frametimer; //Incremented every cycle.
+
+uint16_t GetFrametimer(); //Make sure it gets frametimer as an atomic operation.
+
 
 	//Actual frequency is computed by:
 	//  31250 / speed_rec * speed
@@ -26,6 +33,8 @@ extern uint8_t freq_rs[];
 uint8_t voiceQuicklySleep();
 uint8_t voicePlayWave();
 uint8_t voiceDoBasicSynth();
+uint8_t voiceNoise();
+
 
 uint16_t ReadButtonMask(); //Only reads musical notes.  For the menu button, must look at it directly.
 

@@ -48,41 +48,57 @@ int main()
 		uint8_t i;
 		uint16_t checkmask = 1;
 
-		uint16_t mask = ReadButtonMask();
-
-		for( i = 0; i < 16; i++ )
+		if( MENUBUTTONDOWN )
 		{
-			if( mask & checkmask ) {
-				if( ts ) 
-					ts1 = i+1;
-				else
-					ts = i+1;
-			}
-			checkmask<<=1;
-		}
-
-#define BEND 24
-
-		if( ts != 0 )
-		{
-			speed = freq_s[ts-1+BEND];
-			speed_rec = freq_rs[ts-1+BEND];
-			if( ts1 )
-			{
-				speed1 = freq_s[ts1-1+BEND];
-				speed_rec1 = freq_rs[ts1-1+BEND];
-			}
-			else
-			{
-				speed1 = 0;
-			}
-			voiceptr = &voiceDoBasicSynth;
-			PORTD &=~_BV(1); //LED
+				voiceptr = &voiceNoise;
+				speed = 10;
+				volume = GetFrametimer()>>8;
 		}
 		else
 		{
-			speed = 0;
-			PORTD |= _BV(1); //LED
+			uint16_t mask = ReadButtonMask();
+
+			for( i = 0; i < 16; i++ )
+			{
+				if( mask & checkmask ) {
+					if( ts ) 
+						ts1 = i+1;
+					else
+						ts = i+1;
+				}
+				checkmask<<=1;
+			}
+
+			#define BASENOTE 36
+
+			if( ts != 0 )
+			{
+				volume = 100;
+				volume1 = 100;
+
+				speed = freq_s[ts-1+BASENOTE];
+				speed_rec = freq_rs[ts-1+BASENOTE];
+				if( ts1 )
+				{
+					//2 notes.
+					speed1 = freq_s[ts1-1+BASENOTE];
+					speed_rec1 = freq_rs[ts1-1+BASENOTE];
+				}
+				else
+				{
+					//1 note
+					speed1 = 0;
+				}
+				voiceptr = &voiceDoBasicSynth;
+				PORTD &=~_BV(1); //LED
+			}
+			else
+			{
+				//No notes
+				voiceptr = voiceQuicklySleep;
+				speed = 0;
+				PORTD |= _BV(1); //LED
+			}
 		}
 	}
 }

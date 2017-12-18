@@ -13,15 +13,26 @@ volatile uint8_t speed;
 volatile uint8_t speed_rec;
 volatile uint8_t speed1;
 volatile uint8_t speed_rec1;
+volatile uint8_t volume;
+volatile uint8_t volume1;
+volatile uint16_t frametimer;
 
-//https://stackoverflow.com/questions/1558321/how-do-i-generate-random-numbers-in-a-microcontroller-efficiently
+uint16_t GetFrametimer() //Make sure it gets frametimer as an atomic operation.
+{
+	uint16_t ret;
+	cli();
+	ret = frametimer;
+	sei();
+	return ret;
+}
 
-uint8_t lfsr = 231;
+uint16_t lfsr = 0xACE1u;  /* Any nonzero start state will work. (from wikipedia) */
 
 uint8_t GetRandom()
 {
-	uint8_t input_bit = ((lfsr >> 0) ^ (lfsr >> 2) ^ (lfsr >> 3) ^ (lfsr >> 4)) & 1;
-	lfsr = (lfsr >> 1) | (input_bit << 7);
+	/* taps: 16 14 13 11; feedback polynomial: x^16 + x^14 + x^13 + x^11 + 1 */
+	uint8_t   bit  = ((lfsr >> 0) ^ (lfsr >> 2) ^ (lfsr >> 3) ^ (lfsr >> 5) ) & 1;
+	lfsr = (lfsr >> 1) | (bit << 15);
 	return lfsr;
 }
 
@@ -74,6 +85,8 @@ intcont:\n\
 		in r0,63 /*Store SREG*/\n\
 		push r0\n\
 		clr r1\n\
+		push r16\n\
+		push r17\n\
 		push r18\n\
 		push r19\n\
 		push r20\n\
@@ -86,6 +99,8 @@ intcont:\n\
 		push r31\n\
 	");
 
+
+	frametimer++;
 	/*Ok... We can do whatever we want in here, as long as it's fast and before the end we update
 		OCR0A and OCR0B.  That will cause the actual registers to update AFTER the next cycle. */
 
@@ -138,6 +153,8 @@ end_int:
 		pop r20\n\
 		pop r19\n\
 		pop r18\n\
+		pop r17\n\
+		pop r16\n\
 		pop r0\n\
 		out 63, r0 /*Restore SREG*/\n\
 		pop r1\n\
@@ -213,12 +230,12 @@ uint8_t voiceDoBasicSynth()
 			if( twave < -speed_rec1 ) { up1 = 1; twave = -speed_rec1 - (twave+speed_rec1); } //I hope this is right.
 		}
 		wave1 = twave;
-		wave = (wave1+wave0)/2;
+		wave = ((wave1*volume)>>8)+((wave0*volume)>>8);
 		return 1;
 	}
 	else
 	{
-		wave = wave0;
+		wave = (wave0*volume)>>8;
 		wave1 = 0;
 		return 1;
 	}
@@ -231,6 +248,18 @@ uint8_t voiceQuicklySleep()
 	return 0;
 }
 
+uint8_t voiceNoise()
+{
+	static uint8_t speedmark;
+	speedmark++;
+
+	if( speedmark == speed )
+	{
+		wave = (((int8_t)GetRandom()) * volume)>>8;
+		speedmark = 0;
+	}
+	return 1;
+}
 
 
 uint16_t ReadButtonMask()
