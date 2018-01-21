@@ -16,6 +16,12 @@ volatile uint8_t speed_rec1;
 volatile uint8_t volume;
 volatile uint8_t volume1;
 volatile uint16_t frametimer;
+volatile uint8_t mode;
+volatile uint8_t mode_button;
+volatile uint16_t fade_in;
+volatile uint16_t fade_out;
+volatile uint8_t fade_in_mode;
+volatile uint8_t fade_out_mode;
 
 uint16_t GetFrametimer() //Make sure it gets frametimer as an atomic operation.
 {

@@ -38,7 +38,8 @@ int main()
 
 	sei();
 
-
+	mode_button = 0;
+	mode = 0;
 
 	while(1)
 	{
@@ -50,9 +51,7 @@ int main()
 
 		if( MENUBUTTONDOWN )
 		{
-				voiceptr = &voiceNoise;
-				speed = 10;
-				volume = GetFrametimer()>>8;
+		 mode_button = 1;
 		}
 		else
 		{
@@ -71,8 +70,26 @@ int main()
 
 			#define BASENOTE 36
 
-			if( ts != 0 )
+			if ( mode_button != 0) {
+			  mode_button = 0;
+
+			  voiceptr = voiceQuicklySleep;
+			  speed = 0;
+			  PORTD |= _BV(1);
+
+			  switch (ts) {
+			  case 1:
+			    mode = 0;
+			    break;
+			  case 2:
+			    mode = ts;
+			    break;
+			  }
+			}
+			else if( ts != 0 )
 			{
+			  switch (mode) {
+			  case 0:
 				volume = 100;
 				volume1 = 100;
 
@@ -91,6 +108,29 @@ int main()
 				}
 				voiceptr = &voiceDoBasicSynth;
 				PORTD &=~_BV(1); //LED
+				break;
+			  case 1:
+			  case 2:
+			    volume = 100;
+			    volume1 = 100;
+
+			    speed = freq_s[ts-1+BASENOTE+12*mode];
+			    speed_rec = freq_rs[ts-1+BASENOTE+12*mode];
+			    if( ts1 )
+			    {
+				//2 notes.
+				speed1 = freq_s[ts1-1+BASENOTE+12*mode];
+				speed_rec1 = freq_rs[ts1-1+BASENOTE+12*mode];
+			    }
+			    else
+			    {
+				//1 note
+				speed1 = 0;
+			    }
+			    voiceptr = &voiceDoBasicSynth;
+			    PORTD &=~_BV(1); //LED
+			    break;
+			  }
 			}
 			else
 			{
@@ -108,3 +148,5 @@ int main()
 
 volatile uint8_t speed1;
 volatile uint8_t speed_rec1;
+volatile uint8_t mode_button;
+volatile uint8_t mode;

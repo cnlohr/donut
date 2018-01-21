@@ -16,6 +16,8 @@ extern volatile uint8_t volume;
 extern volatile uint8_t volume1; //Adjust volume.  CAREFUL: If you are playing two notes, the sum of the volume MUST NOT EXCCED 255.
 
 extern volatile uint16_t frametimer; //Incremented every cycle.
+extern volatile uint8_t mode; //Current mode
+extern volatile uint8_t mode_button; //Mode button depressed
 
 uint16_t GetFrametimer(); //Make sure it gets frametimer as an atomic operation.
 
