@@ -39,13 +39,15 @@ uint16_t GetFrametimer() //Make sure it gets frametimer as an atomic operation.
 }
 
 uint16_t lfsr = 0xACE1u;  /* Any nonzero start state will work. (from wikipedia) */
+uint16_t last = 0;
 
 uint8_t GetRandom()
 {
 	/* taps: 16 14 13 11; feedback polynomial: x^16 + x^14 + x^13 + x^11 + 1 */
 	uint8_t   bit  = ((lfsr >> 0) ^ (lfsr >> 2) ^ (lfsr >> 3) ^ (lfsr >> 5) ) & 1;
 	lfsr = (lfsr >> 1) | (bit << 15);
-	return lfsr;
+	if (lfsr == last) lfsr = 0xACE1u;
+	return last = lfsr;
 }
 
 
