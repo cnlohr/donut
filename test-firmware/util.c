@@ -233,7 +233,14 @@ uint8_t voicePlayWave()
 uint8_t voiceDoSquare()
 {
 	sampleCount++;
-	wave = sampleCount % (speed * 2) > speed;
+	if ( speed1 )
+	{
+		wave = (sampleCount % (speed * 2) > speed) ^ (sampleCount % (speed1 * 2) > speed1);
+	}
+	else
+	{
+		wave = sampleCount % (speed * 2) > speed;
+	}
 }
 
 uint8_t voiceDoBasicSynth()

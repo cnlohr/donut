@@ -222,14 +222,41 @@ int main()
 		  case 11:
 		    voiceptr = &voiceDoSquare;
 		    speed = sqfreqs[ts-1];
+		    PORTD &=~_BV(1);
+		    if ( ts1 )
+		    {
+		    	speed1 = sqfreqs[ts1-1];
+		    }
+		    else
+		    {
+		    	speed1 = 0;
+		    }
 		    break;
 		  case 12:
 		    voiceptr = &voiceDoSquare;
+		    PORTD &=~_BV(1);
 		    speed = sqfreqs[ts-1]*2;
+		    if ( ts1 )
+		    {
+		    	speed1 = sqfreqs[ts1-1]*2;
+		    }
+		    else
+		    {
+		    	speed1 = 0;
+		    }
 		    break;
 		  case 13:
 		    voiceptr = &voiceDoSquare;
+		    PORTD &=~_BV(1);
 		    speed = sqfreqs[ts-1]*4;
+		    if ( ts1 )
+		    {
+		    	speed1 = sqfreqs[ts1-1]*4;
+		    }
+		    else
+		    {
+		    	speed1 = 0;
+		    }
 		    break;
 		  }
 		}
