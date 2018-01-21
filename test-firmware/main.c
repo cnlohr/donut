@@ -4,6 +4,8 @@
 #include <avr/pgmspace.h>
 #include <avr/eeprom.h>
 #include <avr/wdt.h>
+#include <avr/power.h>
+#include <avr/sleep.h>
 #include "util.h"
 
 register int8_t wave asm("r2");
@@ -28,8 +30,18 @@ void wdt_first(void)
 int main()
 {
 	cli();
-	wdt_enable(WDTO_15MS);
-	sei();
+	wdt_disable();
+	DDRC &= ~_BV(5);
+	PORTC |= _BV(5);
+	if (!(PINC & _BV(5)))
+	{
+	  set_sleep_mode(SLEEP_MODE_STANDBY);
+	  sleep_enable();
+	  sleep_mode();
+	}
+	wdt_enable(WDTO_4S);
+	mode_button = 0;
+	mode = eeprom_read_byte(0);
 
 	CLKPR=0x80;
 	CLKPR=0x01;
@@ -38,19 +50,14 @@ int main()
 	DDRD = (_BV(3) | _BV(5) | _BV(6) | _BV(1) );
 	DDRB = _BV(3);
 
+	speed = 0;
+	PORTD |= _BV(1) | _BV(3) | _BV(5) | _BV(6);
 	voiceptr = &voiceQuicklySleep;
 
-//_BV(COM0A1) |
-//_BV(COM0B1) | 
 	TCCR0A = _BV(COM0B1) | _BV(COM0A1) | _BV(WGM01) | _BV(WGM00); //Phase correct PWM on TCCR0A, Clear on compare match.
 	TCCR0B = _BV(CS00);
 	TIMSK0 |= _BV(TOIE0);// | _BV(OCIE0A);
 	OCR0A = OCR0B = 255;
-	//DDRD &= ~_BV(5);
-	//DDRD |= _BV(6);
-	//DDRD &= ~_BV(6);
-
-
 
 	PORTB |= _BV(0) | _BV(1) | _BV(4) | _BV(5);
 	PORTC |= 0x3f;
@@ -59,8 +66,6 @@ int main()
 
 	sei();
 
-	mode_button = 0;
-	mode = eeprom_read_byte(0);
 	if ( mode > 13 )
 	{
 		mode = 3;
@@ -71,7 +76,7 @@ int main()
 
 	while(1)
 	{
-		wdt_reset();
+		mode = mode % 14;
 		uint8_t ts = 0;
 		uint8_t ts1 = 0;
 
@@ -98,10 +103,14 @@ int main()
 			}
 
 			#define BASENOTE 0
+			if ( ts || ts1 )
+			{
+			  wdt_reset();
+			}
 
 			if ( mode_button != 0) {
 			  mode_button = 0;
-
+			  wdt_reset();
 			  voiceptr = voiceQuicklySleep;
 			  speed = 0;
 			  PORTD |= _BV(1);

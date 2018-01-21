@@ -32,7 +32,7 @@ program.lst : $(SRCS) $(REQS)
 	avr-gcc -c -g -Wa,-a,-ad $(CFLAGS) $(SRCS) > $@
 
 burn : program.hex
-	sudo avrdude -c usbtiny -p $(PROGRAMCODE) -U flash:w:program.hex -F -B 4
+	sudo avrdude -c usbtiny -p $(PROGRAMCODE) -U flash:w:program.hex -F -B 3
 
 
 burnall : burn burnfuses
