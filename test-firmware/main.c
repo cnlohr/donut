@@ -116,7 +116,7 @@ int main()
 			    break;
 			  case 6:
 			    volume = 10*ts;
-			    speed = ts;
+			    speed = 14-ts;
 			    voiceptr = &voiceNoise;
 			    PORTD &=~_BV(1); //LED
 			    break;
