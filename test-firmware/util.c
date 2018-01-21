@@ -7,6 +7,8 @@
 #include "calced_speeds.c"
 
 int8_t wave;
+int8_t wave0;
+int8_t wave1;
 
 uint8_t (* volatile voiceptr)();
 volatile uint8_t speed;
@@ -172,17 +174,30 @@ end_int:
 #define HAS_SAMPLES
 #ifdef HAS_SAMPLES
 #include "samples.c"
-const extern int8_t PROGMEM auddat[NUM_SAMPLES];
-uint16_t sampleCount = 0;
+const extern int8_t PROGMEM aud0dat[NUM_SAMPLES0];
+const extern int8_t PROGMEM aud1dat[NUM_SAMPLES1];
+uint16_t sample0Count = 0;
+uint16_t sample1Count = 0;
 uint8_t voicePlayWave()
 {
-	wave = pgm_read_byte( &auddat[sampleCount] );
-	if( sampleCount == NUM_SAMPLES )
+	wave0 = pgm_read_byte( &aud0dat[sample0Count] );
+	wave1 = pgm_read_byte( &aud1dat[sample1Count] );
+	if( sample0Count == NUM_SAMPLES0 && sample1Count == NUM_SAMPLES1 )
 	{
 		voiceptr = voiceQuicklySleep;
-		sampleCount = 0;
+		return 0;
 	}
-	sampleCount++;
+	wave = 0;
+	if ( sample0Count < NUM_SAMPLES0 )
+	{
+		sample0Count++;
+		wave += wave0;
+	}
+	if ( sample1Count < NUM_SAMPLES1 )
+	{
+		sample1Count++;
+		wave += wave1;
+	}
 	return 1;
 }
 #else
@@ -198,8 +213,6 @@ uint8_t voiceDoBasicSynth()
 	int16_t twave;
 	static uint8_t up;
 	static uint8_t up1;
-	static int8_t wave0;
-	static int8_t wave1;
 
 
 	if( !speed )
