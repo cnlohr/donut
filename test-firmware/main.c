@@ -39,7 +39,7 @@ int main()
 	sei();
 
 	mode_button = 0;
-	mode = 0;
+	mode = 3;
 
 	while(1)
 	{
@@ -68,7 +68,7 @@ int main()
 				checkmask<<=1;
 			}
 
-			#define BASENOTE 36
+			#define BASENOTE 0
 
 			if ( mode_button != 0) {
 			  mode_button = 0;
@@ -76,41 +76,17 @@ int main()
 			  voiceptr = voiceQuicklySleep;
 			  speed = 0;
 			  PORTD |= _BV(1);
-
-			  switch (ts) {
-			  case 1:
-			    mode = 0;
-			    break;
-			  case 2:
-			    mode = ts;
-			    break;
-			  }
+			  mode = ts;
 			}
 			else if( ts != 0 )
 			{
 			  switch (mode) {
 			  case 0:
-				volume = 100;
-				volume1 = 100;
-
-				speed = freq_s[ts-1+BASENOTE];
-				speed_rec = freq_rs[ts-1+BASENOTE];
-				if( ts1 )
-				{
-					//2 notes.
-					speed1 = freq_s[ts1-1+BASENOTE];
-					speed_rec1 = freq_rs[ts1-1+BASENOTE];
-				}
-				else
-				{
-					//1 note
-					speed1 = 0;
-				}
-				voiceptr = &voiceDoBasicSynth;
-				PORTD &=~_BV(1); //LED
-				break;
 			  case 1:
 			  case 2:
+			  case 3:
+			  case 4:
+			  case 5:
 			    volume = 100;
 			    volume1 = 100;
 
@@ -128,6 +104,12 @@ int main()
 				speed1 = 0;
 			    }
 			    voiceptr = &voiceDoBasicSynth;
+			    PORTD &=~_BV(1); //LED
+			    break;
+			  case 6:
+			    volume = 10*ts;
+			    speed = ts;
+			    voiceptr = &voiceNoise;
 			    PORTD &=~_BV(1); //LED
 			    break;
 			  }

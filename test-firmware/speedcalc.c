@@ -7,19 +7,19 @@ int main()
 	float f;
 	int note;
 
-#define NUMNOTES 72 //6 octaves
+#define NUMNOTES 85 //7 octaves
 	uint8_t freq_s[NUMNOTES];
 	uint8_t freq_rs[NUMNOTES];
 	for( note = 0; note < NUMNOTES; note++ )
 	{
-		f = 130.81 * powf( 2.0f, ((float)note)/12.0f ); //C3 base note.
+		f = 261.63 * powf( 2.0f, ((float)note)/12.0f ); //C3 base note.
 
 		int target_rs, target_speed;
 		int best_rs;
 		int best_speed;
 		float best_err = 1e20;
 
-		for( target_rs = 64; target_rs < 126; target_rs++ )
+		for( target_rs = 64; target_rs < 129; target_rs++ )
 		{
 			for( target_speed = 1; target_speed < target_rs - 1;  target_speed++ )
 			{
