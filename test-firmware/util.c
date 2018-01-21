@@ -182,8 +182,8 @@ const extern int8_t PROGMEM aud1dat[NUM_SAMPLES1];
 uint8_t voicePlayWave()
 {
 	wave0 = pgm_read_byte( &aud0dat[sample0Count>>1] );
-	wave1 = pgm_read_byte( &aud1dat[sample1Count>>2] );
-	if( sample0Count == (NUM_SAMPLES0*2) && sample1Count == (NUM_SAMPLES1*4) )
+	wave1 = pgm_read_byte( &aud1dat[sample1Count>>1] );
+	if( sample0Count == (NUM_SAMPLES0*2) && sample1Count == (NUM_SAMPLES1*2) )
 	{
 		wavedone = 1;
 		voiceptr = voiceQuicklySleep;
@@ -197,7 +197,7 @@ uint8_t voicePlayWave()
 	if ( sample0Count < NUM_SAMPLES0*2 )
 	{
 		sample0Count++;
-		if ( sample1Count < NUM_SAMPLES1*4 && sample1Count > sample0Count )
+		if ( sample1Count < NUM_SAMPLES1*2 && sample1Count > sample0Count )
 		{
 			wave += wave0>>1;
 		}
@@ -206,7 +206,7 @@ uint8_t voicePlayWave()
 			wave += wave0;
 		}
 	}
-	if ( sample1Count < NUM_SAMPLES1*4 )
+	if ( sample1Count < NUM_SAMPLES1*2 )
 	{
 		sample1Count++;
 		if (sample0Count < NUM_SAMPLES0*2 && sample1Count < sample0Count )
