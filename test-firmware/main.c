@@ -115,6 +115,7 @@ int main()
 			  case 7:
 			    voiceptr = &voicePlayWave;
 			    PORTD &=~_BV(1); //LED
+			    break;
 			  case 8:
 			    //Tuned noise
 			    volume = 100;
