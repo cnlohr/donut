@@ -10,7 +10,7 @@ REQS := calced_speeds.c samples.c
 
 samples.c : sampleenc
 	cp ./mag.raw sample0.raw
-	cp ./con.raw sample1.raw
+	cp ./fest.raw sample1.raw
 	./sampleenc > samples.c
 
 sampleenc : sampleenc.c
