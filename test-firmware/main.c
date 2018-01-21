@@ -117,8 +117,8 @@ int main()
 			  case 3:
 			  case 4:
 			  case 5:
-			    volume = 100;
-			    volume1 = 100;
+			    volume = 127;
+			    volume1 = 127;
 
 			    speed = freq_s[ts-1+BASENOTE+12*mode];
 			    speed_rec = freq_rs[ts-1+BASENOTE+12*mode];
