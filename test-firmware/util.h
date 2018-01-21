@@ -14,6 +14,9 @@ extern volatile uint8_t speed1;  //This is effectively a second voice.  Cannot b
 extern volatile uint8_t speed_rec1;
 extern volatile uint8_t volume;
 extern volatile uint8_t volume1; //Adjust volume.  CAREFUL: If you are playing two notes, the sum of the volume MUST NOT EXCCED 255.
+extern volatile uint16_t sample0Count;
+extern volatile uint16_t sample1Count;
+extern volatile uint8_t wavedone;
 
 extern volatile uint16_t frametimer; //Incremented every cycle.
 extern volatile uint8_t mode; //Current mode

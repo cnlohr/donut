@@ -4,7 +4,6 @@
 #include <avr/pgmspace.h>
 #include "util.h"
 
-
 register int8_t wave asm("r2");
 
 
@@ -40,6 +39,8 @@ int main()
 
 	mode_button = 0;
 	mode = 3;
+	uint8_t sample0down = 0;
+	uint8_t sample1down = 0;
 
 	while(1)
 	{
@@ -78,7 +79,7 @@ int main()
 			  PORTD |= _BV(1);
 			  mode = ts;
 			}
-			else if( ts != 0 || mode == 9)
+			else if( ts != 0 || mode == 9 || mode == 7)
 			{
 			  switch (mode) {
 			  case 0:
@@ -113,8 +114,42 @@ int main()
 			    PORTD &=~_BV(1); //LED
 			    break;
 			  case 7:
-			    voiceptr = &voicePlayWave;
-			    PORTD &=~_BV(1); //LED
+			    if ( (ts > 0 && ts < 7) || (ts1 > 0 && ts1 < 7) )
+			    {
+			      if ( !sample0down )
+			      {
+			        sample0down = 1;
+			        sample0Count = 0;
+			        wavedone = 0;
+			      }
+			    }
+			    else
+			    {
+			      sample0down = 0;
+			    }
+			    if ( ts > 6 || ts1 > 6 )
+			    {
+			      if ( !sample1down )
+			      {
+			        sample1down = 1;
+			        sample1Count = 0;
+			        wavedone = 0;
+			      }
+			    }
+			    else
+			    {
+			      sample1down = 0;
+			    }
+			    if ( wavedone )
+			    {
+			      voiceptr = &voiceQuicklySleep;
+			      PORTD |=_BV(1); //LED
+			    }
+			    else
+			    {
+			      voiceptr = &voicePlayWave;
+			      PORTD &=~_BV(1); //LED
+			    }
 			    break;
 			  case 8:
 			    //Tuned noise

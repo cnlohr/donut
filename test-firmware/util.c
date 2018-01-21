@@ -24,6 +24,9 @@ volatile uint16_t fade_in;
 volatile uint16_t fade_out;
 volatile uint8_t fade_in_mode;
 volatile uint8_t fade_out_mode;
+volatile uint16_t sample0Count = 0;
+volatile uint16_t sample1Count = 0;
+volatile uint8_t wavedone = 0;
 
 uint16_t GetFrametimer() //Make sure it gets frametimer as an atomic operation.
 {
@@ -176,16 +179,19 @@ end_int:
 #include "samples.c"
 const extern int8_t PROGMEM aud0dat[NUM_SAMPLES0];
 const extern int8_t PROGMEM aud1dat[NUM_SAMPLES1];
-uint16_t sample0Count = 0;
-uint16_t sample1Count = 0;
 uint8_t voicePlayWave()
 {
-	wave0 = pgm_read_byte( &aud0dat[sample0Count] );
-	wave1 = pgm_read_byte( &aud1dat[sample1Count] );
+	wave0 = pgm_read_byte( &aud0dat[sample0Count>>1] );
+	wave1 = pgm_read_byte( &aud1dat[sample1Count>>1] );
 	if( sample0Count == NUM_SAMPLES0 && sample1Count == NUM_SAMPLES1 )
 	{
+		wavedone = 1;
 		voiceptr = voiceQuicklySleep;
 		return 0;
+	}
+	else
+	{
+		wavedone = 0;
 	}
 	wave = 0;
 	if ( sample0Count < NUM_SAMPLES0 )
