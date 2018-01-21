@@ -6,6 +6,13 @@
 
 register int8_t wave asm("r2");
 
+uint8_t kit0_speed[] = {  23,  22,  21,  20,  19,  18,  17,  16,  15,  14,  13,  12,  11 };
+uint16_t kit0_fade[] = {  24,  24,  24,  24,  24,  24,  24,  24,  24,  24,  24,  24,  24 };
+uint8_t kit0_drop[] =  {  23,  22,  21,  20,  19,  18,  17,  16,  15,  14,  13,  12,  11 };
+
+uint8_t kit1_speed[] = {  10,   9,   8,   7,   6,   5,   4,   3,   2,   2,   2,   2,   2 };
+uint16_t kit1_fade[] = { 128, 512, 128, 128, 128, 128, 128, 128, 255, 255, 255, 512, 1024 };
+uint8_t kit1_drop[] =  {  5,   64,  10,  10,  10,  16,  16,  16,  24,  24,  24,  64, 128 };
 
 int main()
 {
@@ -79,7 +86,7 @@ int main()
 			  PORTD |= _BV(1);
 			  mode = ts;
 			}
-			else if( ts != 0 || mode == 9 || mode == 7)
+			else if( ts != 0 || mode == 7 || mode == 9 || mode == 10)
 			{
 			  switch (mode) {
 			  case 0:
@@ -154,13 +161,8 @@ int main()
 			  case 8:
 			    //Tuned noise
 			    volume = 100;
-			    volume1 = 100;
 
-			    if( ts1 )
-			    {
-			      speed1 = 24-ts1;
-			      speed = 24-ts;
-			    } else if (ts) {
+			    if (ts) {
 			      speed = 24-ts;
 			    }
 
@@ -169,20 +171,27 @@ int main()
 			    break;
 			  case 9:
 			    //Drum Synths
-
-			    if( ts1 )
-			    {
-			      speed1 = 24-ts1;
-			      speed = 24-ts;
-			    } else if (ts) {
-			      speed = 24-ts;
-			    }
-
 			    if (ts) {
 			      volume = 100;
-			      volume1 = 100;
+			      
+			      speed = kit0_speed[ts-1];
+			      fade_out = kit0_fade[ts-1];
+			      fade_out_mode = kit0_drop[ts-1];
+			      PORTD &=~_BV(1);
+			    } else {
+			      PORTD |= _BV(1);
+			    }
 
-			      fade_out = 24;
+			    voiceptr = &voiceDrums;
+			    break;
+			  case 10:
+			    //Drum Synths
+			    if (ts) {
+			      volume = 100;
+
+			      speed = kit1_speed[ts-1];
+			      fade_out = kit1_fade[ts-1];
+			      fade_out_mode = kit1_drop[ts-1];
 			      PORTD &=~_BV(1);
 			    } else {
 			      PORTD |= _BV(1);

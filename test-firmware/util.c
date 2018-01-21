@@ -283,16 +283,21 @@ uint8_t voiceTunedNoise()
 uint8_t voiceDrums()
 {
   static uint8_t drum_s;
+  static uint8_t drum_f;
   static uint16_t ticks;
 
   drum_s++;
+  drum_f++;
 
   if (drum_s == speed) {
     wave = (((int8_t)GetRandom()) * volume) >> 8;
     drum_s = 0;
     ticks++;
+  }
 
-    if (ticks > fade_out) {
+  if (ticks > fade_out) {
+    if (drum_f == fade_out_mode) {
+      drum_f = 0;
       volume--;
     }
   }
@@ -300,6 +305,7 @@ uint8_t voiceDrums()
   if (volume == 0) {
     ticks = 0;
     drum_s = 0;
+    drum_f = 0;
     return 0;
   }
 
