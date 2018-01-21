@@ -112,6 +112,10 @@ int main()
 			    voiceptr = &voiceNoise;
 			    PORTD &=~_BV(1); //LED
 			    break;
+			  case 7:
+			    voiceptr = &voicePlayWave;
+			    PORTD &=~_BV(1); //LED
+			    break;
 			  }
 			}
 			else

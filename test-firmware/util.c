@@ -169,15 +169,15 @@ end_int:
 }
 
 
-
+#define HAS_SAMPLES
 #ifdef HAS_SAMPLES
 #include "samples.c"
-const extern int8_t PROGMEM auddat[7981];
+const extern int8_t PROGMEM auddat[NUM_SAMPLES];
+uint16_t sampleCount = 0;
 uint8_t voicePlayWave()
 {
-	static uint16_t sampleCount = 0;
-	wave = pgm_read_byte( &auddat[sampleCount>>2] );
-	if( sampleCount == 32000 )
+	wave = pgm_read_byte( &auddat[sampleCount] );
+	if( sampleCount == NUM_SAMPLES )
 	{
 		voiceptr = voiceQuicklySleep;
 		sampleCount = 0;

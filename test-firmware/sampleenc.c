@@ -12,7 +12,7 @@ int main()
 	int8_t * dat = malloc( len );
 	fread( dat, 1, len, f );
 	fclose( f );
-	printf( "#include <stdint.h>\n#include <avr/pgmspace.h>\nconst int8_t PROGMEM auddat[%d] = {", len );
+	printf( "#include <stdint.h>\n#include <avr/pgmspace.h>\n#define NUM_SAMPLES %d\nconst int8_t PROGMEM auddat[%d] = {", len, len );
 	int i;
 	for( i = 0; i < len; i++ )
 	{
