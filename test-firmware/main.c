@@ -61,7 +61,7 @@ int main()
 
 	mode_button = 0;
 	mode = eeprom_read_byte(0);
-	if ( mode > 8 )
+	if ( mode > 13 )
 	{
 		mode = 3;
 		eeprom_write_byte(0, mode);
