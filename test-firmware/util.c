@@ -247,7 +247,45 @@ uint8_t voiceDoBasicSynth()
 	}
 }
 
+uint8_t voiceTunedNoise()
+{
+  static uint8_t mark_s, mark_s1;
 
+  mark_s++;
+  
+  if (mark_s == speed) {
+    wave = (((int8_t)GetRandom()) * volume) >> 8;
+    mark_s = 0;
+  }
+
+  return 1;
+}
+
+uint8_t voiceDrums()
+{
+  static uint8_t drum_s;
+  static uint16_t ticks;
+
+  drum_s++;
+
+  if (drum_s == speed) {
+    wave = (((int8_t)GetRandom()) * volume) >> 8;
+    drum_s = 0;
+    ticks++;
+
+    if (ticks > fade_out) {
+      volume--;
+    }
+  }
+
+  if (volume == 0) {
+    ticks = 0;
+    drum_s = 0;
+    return 0;
+  }
+
+  return 1;
+}
 
 uint8_t voiceQuicklySleep()
 {
@@ -266,7 +304,6 @@ uint8_t voiceNoise()
 	}
 	return 1;
 }
-
 
 uint16_t ReadButtonMask()
 {

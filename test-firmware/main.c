@@ -78,7 +78,7 @@ int main()
 			  PORTD |= _BV(1);
 			  mode = ts;
 			}
-			else if( ts != 0 )
+			else if( ts != 0 || mode == 9)
 			{
 			  switch (mode) {
 			  case 0:
@@ -115,6 +115,44 @@ int main()
 			  case 7:
 			    voiceptr = &voicePlayWave;
 			    PORTD &=~_BV(1); //LED
+			  case 8:
+			    //Tuned noise
+			    volume = 100;
+			    volume1 = 100;
+
+			    if( ts1 )
+			    {
+			      speed1 = 24-ts1;
+			      speed = 24-ts;
+			    } else if (ts) {
+			      speed = 24-ts;
+			    }
+
+			    voiceptr = &voiceTunedNoise;
+			    PORTD &=~_BV(1);
+			    break;
+			  case 9:
+			    //Drum Synths
+
+			    if( ts1 )
+			    {
+			      speed1 = 24-ts1;
+			      speed = 24-ts;
+			    } else if (ts) {
+			      speed = 24-ts;
+			    }
+
+			    if (ts) {
+			      volume = 100;
+			      volume1 = 100;
+
+			      fade_out = 24;
+			      PORTD &=~_BV(1);
+			    } else {
+			      PORTD |= _BV(1);
+			    }
+
+			    voiceptr = &voiceDrums;
 			    break;
 			  }
 			}
@@ -136,3 +174,5 @@ volatile uint8_t speed1;
 volatile uint8_t speed_rec1;
 volatile uint8_t mode_button;
 volatile uint8_t mode;
+volatile uint16_t fade_out;
+volatile uint8_t fade_out_mode;

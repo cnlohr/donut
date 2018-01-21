@@ -18,6 +18,8 @@ extern volatile uint8_t volume1; //Adjust volume.  CAREFUL: If you are playing t
 extern volatile uint16_t frametimer; //Incremented every cycle.
 extern volatile uint8_t mode; //Current mode
 extern volatile uint8_t mode_button; //Mode button depressed
+extern volatile uint16_t fade_out;
+extern volatile uint8_t fade_out_mode;
 
 uint16_t GetFrametimer(); //Make sure it gets frametimer as an atomic operation.
 
@@ -36,6 +38,8 @@ uint8_t voiceQuicklySleep();
 uint8_t voicePlayWave();
 uint8_t voiceDoBasicSynth();
 uint8_t voiceNoise();
+uint8_t voiceTunedNoise();
+uint8_t voiceDrums();
 
 
 uint16_t ReadButtonMask(); //Only reads musical notes.  For the menu button, must look at it directly.
