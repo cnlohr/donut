@@ -9,6 +9,8 @@ SRCS :=  main.c util.c
 REQS := calced_speeds.c samples.c
 
 samples.c : sampleenc
+	cp ./mag.raw sample0.raw
+	cp ./fest.raw sample1.raw
 	./sampleenc > samples.c
 
 sampleenc : sampleenc.c
@@ -30,7 +32,7 @@ program.lst : $(SRCS) $(REQS)
 	avr-gcc -c -g -Wa,-a,-ad $(CFLAGS) $(SRCS) > $@
 
 burn : program.hex
-	sudo avrdude -c usbtiny -p $(PROGRAMCODE) -U flash:w:program.hex -F
+	sudo avrdude -c usbtiny -p $(PROGRAMCODE) -U flash:w:program.hex -F -B 4
 
 
 burnall : burn burnfuses

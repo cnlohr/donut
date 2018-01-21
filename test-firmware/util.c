@@ -7,6 +7,8 @@
 #include "calced_speeds.c"
 
 int8_t wave;
+int8_t wave0;
+int8_t wave1;
 
 uint8_t (* volatile voiceptr)();
 volatile uint8_t speed;
@@ -16,6 +18,15 @@ volatile uint8_t speed_rec1;
 volatile uint8_t volume;
 volatile uint8_t volume1;
 volatile uint16_t frametimer;
+volatile uint8_t mode;
+volatile uint8_t mode_button;
+volatile uint16_t fade_in;
+volatile uint16_t fade_out;
+volatile uint8_t fade_in_mode;
+volatile uint8_t fade_out_mode;
+volatile uint16_t sample0Count = 0;
+volatile uint16_t sample1Count = 0;
+volatile uint8_t wavedone = 0;
 
 uint16_t GetFrametimer() //Make sure it gets frametimer as an atomic operation.
 {
@@ -163,20 +174,50 @@ end_int:
 }
 
 
-
+#define HAS_SAMPLES
 #ifdef HAS_SAMPLES
 #include "samples.c"
-const extern int8_t PROGMEM auddat[7981];
+const extern int8_t PROGMEM aud0dat[NUM_SAMPLES0];
+const extern int8_t PROGMEM aud1dat[NUM_SAMPLES1];
 uint8_t voicePlayWave()
 {
-	static uint16_t sampleCount = 0;
-	wave = pgm_read_byte( &auddat[sampleCount>>2] );
-	if( sampleCount == 32000 )
+	wave0 = pgm_read_byte( &aud0dat[sample0Count>>1] );
+	wave1 = pgm_read_byte( &aud1dat[sample1Count>>1] );
+	if( sample0Count == (NUM_SAMPLES0*2) && sample1Count == (NUM_SAMPLES1*2) )
 	{
+		wavedone = 1;
 		voiceptr = voiceQuicklySleep;
-		sampleCount = 0;
+		return 0;
 	}
-	sampleCount++;
+	else
+	{
+		wavedone = 0;
+	}
+	wave = 0;
+	if ( sample0Count < NUM_SAMPLES0*2 )
+	{
+		sample0Count++;
+		if ( sample1Count < NUM_SAMPLES1*2 && sample1Count > sample0Count )
+		{
+			wave += wave0>>1;
+		}
+		else
+		{
+			wave += wave0;
+		}
+	}
+	if ( sample1Count < NUM_SAMPLES1*2 )
+	{
+		sample1Count++;
+		if (sample0Count < NUM_SAMPLES0*2 && sample1Count < sample0Count )
+		{
+			wave += wave1>>1;
+		}
+		else
+		{
+			wave += wave1;
+		}
+	}
 	return 1;
 }
 #else
@@ -192,8 +233,6 @@ uint8_t voiceDoBasicSynth()
 	int16_t twave;
 	static uint8_t up;
 	static uint8_t up1;
-	static int8_t wave0;
-	static int8_t wave1;
 
 
 	if( !speed )
@@ -241,7 +280,51 @@ uint8_t voiceDoBasicSynth()
 	}
 }
 
+uint8_t voiceTunedNoise()
+{
+  static uint8_t mark_s, mark_s1;
 
+  mark_s++;
+  
+  if (mark_s == speed) {
+    wave = (((int8_t)GetRandom()) * volume) >> 8;
+    mark_s = 0;
+  }
+
+  return 1;
+}
+
+uint8_t voiceDrums()
+{
+  static uint8_t drum_s;
+  static uint8_t drum_f;
+  static uint16_t ticks;
+
+  drum_s++;
+  drum_f++;
+
+  if (drum_s == speed) {
+    wave = (((int8_t)GetRandom()) * volume) >> 8;
+    drum_s = 0;
+    ticks++;
+  }
+
+  if (ticks > fade_out) {
+    if (drum_f == fade_out_mode) {
+      drum_f = 0;
+      volume--;
+    }
+  }
+
+  if (volume == 0) {
+    ticks = 0;
+    drum_s = 0;
+    drum_f = 0;
+    return 0;
+  }
+
+  return 1;
+}
 
 uint8_t voiceQuicklySleep()
 {
@@ -260,7 +343,6 @@ uint8_t voiceNoise()
 	}
 	return 1;
 }
-
 
 uint16_t ReadButtonMask()
 {
