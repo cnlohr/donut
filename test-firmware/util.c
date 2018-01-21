@@ -24,6 +24,7 @@ volatile uint16_t fade_in;
 volatile uint16_t fade_out;
 volatile uint8_t fade_in_mode;
 volatile uint8_t fade_out_mode;
+volatile uint16_t sampleCount = 0;
 volatile uint16_t sample0Count = 0;
 volatile uint16_t sample1Count = 0;
 volatile uint8_t wavedone = 0;
@@ -227,6 +228,13 @@ uint8_t voicePlayWave()
 }
 
 #endif
+
+
+uint8_t voiceDoSquare()
+{
+	sampleCount++;
+	wave = sampleCount % (speed * 2) > speed;
+}
 
 uint8_t voiceDoBasicSynth()
 {

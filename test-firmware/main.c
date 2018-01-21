@@ -18,6 +18,8 @@ uint8_t kit1_speed[] = {  14,  13,   16,  11,  10,   9,   8,   7,   6,   5,   4,
 uint16_t kit1_fade[] = { 128, 512,    8, 128, 128, 128, 128, 128, 255, 255, 255, 512,1024 };
 uint8_t kit1_drop[] =  {  5,   64,    4,  10,  10,  16,  16,  16,  24,  24,  24,  64, 128 };
 
+uint8_t sqfreqs[] =    { 23,  22,  21,  20,  19,  18,  17,  16,  15,  14,  13,  12,  11};
+
 void wdt_first(void) __attribute__((naked)) __attribute__((section(".init3")));
 
 void wdt_first(void)
@@ -30,16 +32,6 @@ void wdt_first(void)
 int main()
 {
 	cli();
-	wdt_disable();
-	DDRC &= ~_BV(5);
-	PORTC |= _BV(5);
-	if (!(PINC & _BV(5)))
-	{
-	  set_sleep_mode(SLEEP_MODE_STANDBY);
-	  sleep_enable();
-	  sleep_mode();
-	}
-	wdt_enable(WDTO_4S);
 	mode_button = 0;
 	mode = eeprom_read_byte(0);
 
@@ -73,9 +65,12 @@ int main()
 	}
 	uint8_t sample0down = 0;
 	uint8_t sample1down = 0;
-
+	uint8_t newmode = 0;
+	uint8_t old_mode_button = 0;
+	
 	while(1)
 	{
+		mode_button = MENUBUTTONDOWN;
 		mode = mode % 14;
 		uint8_t ts = 0;
 		uint8_t ts1 = 0;
@@ -83,163 +78,169 @@ int main()
 		uint8_t i;
 		uint16_t checkmask = 1;
 
-		if( MENUBUTTONDOWN )
+		uint16_t mask = ReadButtonMask();
+		for( i = 0; i < 16; i++ )
 		{
-		 mode_button = 1;
+			if( mask & checkmask ) {
+				if( ts ) 
+					ts1 = i+1;
+				else
+					ts = i+1;
+			}
+			checkmask<<=1;
+		}
+
+		#define BASENOTE 0
+		if ( ts || ts1 )
+		{
+		  wdt_reset();
+		  if ( mode_button )
+		  {
+		    newmode = ts;
+		  }
+		}
+		if ( old_mode_button && !mode_button ) {
+		  wdt_reset();
+		  voiceptr = voiceQuicklySleep;
+		  speed = 0;
+		  mode = newmode;
+		  PORTD |= _BV(1);
+		  eeprom_write_byte(0, mode);
+		}
+		else if( ts != 0 || mode == 7 || mode == 9 || mode == 10)
+		{
+		  switch (mode) {
+		  case 0:
+		  case 1:
+		  case 2:
+		  case 3:
+		  case 4:
+		  case 5:
+		    volume = 127;
+		    volume1 = 127;
+
+		    speed = freq_s[ts-1+BASENOTE+12*mode];
+		    speed_rec = freq_rs[ts-1+BASENOTE+12*mode];
+		    if( ts1 )
+		    {
+			//2 notes.
+			speed1 = freq_s[ts1-1+BASENOTE+12*mode];
+			speed_rec1 = freq_rs[ts1-1+BASENOTE+12*mode];
+		    }
+		    else
+		    {
+			//1 note
+			speed1 = 0;
+		    }
+		    voiceptr = &voiceDoBasicSynth;
+		    PORTD &=~_BV(1); //LED
+		    break;
+		  case 6:
+		    volume = 10*ts;
+		    speed = 14-ts;
+		    voiceptr = &voiceNoise;
+		    PORTD &=~_BV(1); //LED
+		    break;
+		  case 7:
+		    if ( (ts > 0 && ts < 7) || (ts1 > 0 && ts1 < 7) )
+		    {
+		      if ( !sample0down )
+		      {
+		        sample0down = 1;
+		        sample0Count = 0;
+		        wavedone = 0;
+		      }
+		    }
+		    else
+		    {
+		      sample0down = 0;
+		    }
+		    if ( ts > 6 || ts1 > 6 )
+		    {
+		      if ( !sample1down )
+		      {
+		        sample1down = 1;
+		        sample1Count = 0;
+		        wavedone = 0;
+		      }
+		    }
+		    else
+		    {
+		      sample1down = 0;
+		    }
+		    if ( wavedone )
+		    {
+		      voiceptr = &voiceQuicklySleep;
+		      PORTD |=_BV(1); //LED
+		    }
+		    else
+		    {
+		      voiceptr = &voicePlayWave;
+		      PORTD &=~_BV(1); //LED
+		    }
+		    break;
+		  case 8:
+		    //Tuned noise
+		    volume = 100;
+		    if (ts) {
+		      speed = 24-ts;
+		    }
+
+		    voiceptr = &voiceTunedNoise;
+		    PORTD &=~_BV(1);
+		    break;
+		  case 9:
+		    //Drum Synths
+		    if (ts) {
+		      volume = 100;
+		      
+		      speed = kit0_speed[ts-1];
+		      fade_out = kit0_fade[ts-1];
+		      fade_out_mode = kit0_drop[ts-1];
+		      PORTD &=~_BV(1);
+		    } else {
+		      PORTD |= _BV(1);
+		    }
+
+		    voiceptr = &voiceDrums;
+		    break;
+		  case 10:
+		    //Drum Synths
+		    if (ts) {
+		      volume = 100;
+
+		      speed = kit1_speed[ts-1];
+		      fade_out = kit1_fade[ts-1];
+		      fade_out_mode = kit1_drop[ts-1];
+		      PORTD &=~_BV(1);
+		    } else {
+		      PORTD |= _BV(1);
+		    }
+
+		    voiceptr = &voiceDrums;
+		    break;
+		  case 11:
+		    voiceptr = &voiceDoSquare;
+		    speed = sqfreqs[ts-1];
+		    break;
+		  case 12:
+		    voiceptr = &voiceDoSquare;
+		    speed = sqfreqs[ts-1]*2;
+		    break;
+		  case 13:
+		    voiceptr = &voiceDoSquare;
+		    speed = sqfreqs[ts-1]*4;
+		    break;
+		  }
 		}
 		else
 		{
-			uint16_t mask = ReadButtonMask();
-
-			for( i = 0; i < 16; i++ )
-			{
-				if( mask & checkmask ) {
-					if( ts ) 
-						ts1 = i+1;
-					else
-						ts = i+1;
-				}
-				checkmask<<=1;
-			}
-
-			#define BASENOTE 0
-			if ( ts || ts1 )
-			{
-			  wdt_reset();
-			}
-
-			if ( mode_button != 0) {
-			  mode_button = 0;
-			  wdt_reset();
-			  voiceptr = voiceQuicklySleep;
-			  speed = 0;
-			  PORTD |= _BV(1);
-			  mode = ts;
-			  eeprom_write_byte(0, mode);
-			}
-			else if( ts != 0 || mode == 7 || mode == 9 || mode == 10)
-			{
-			  switch (mode) {
-			  case 0:
-			  case 1:
-			  case 2:
-			  case 3:
-			  case 4:
-			  case 5:
-			    volume = 127;
-			    volume1 = 127;
-
-			    speed = freq_s[ts-1+BASENOTE+12*mode];
-			    speed_rec = freq_rs[ts-1+BASENOTE+12*mode];
-			    if( ts1 )
-			    {
-				//2 notes.
-				speed1 = freq_s[ts1-1+BASENOTE+12*mode];
-				speed_rec1 = freq_rs[ts1-1+BASENOTE+12*mode];
-			    }
-			    else
-			    {
-				//1 note
-				speed1 = 0;
-			    }
-			    voiceptr = &voiceDoBasicSynth;
-			    PORTD &=~_BV(1); //LED
-			    break;
-			  case 6:
-			    volume = 10*ts;
-			    speed = 14-ts;
-			    voiceptr = &voiceNoise;
-			    PORTD &=~_BV(1); //LED
-			    break;
-			  case 7:
-			    if ( (ts > 0 && ts < 7) || (ts1 > 0 && ts1 < 7) )
-			    {
-			      if ( !sample0down )
-			      {
-			        sample0down = 1;
-			        sample0Count = 0;
-			        wavedone = 0;
-			      }
-			    }
-			    else
-			    {
-			      sample0down = 0;
-			    }
-			    if ( ts > 6 || ts1 > 6 )
-			    {
-			      if ( !sample1down )
-			      {
-			        sample1down = 1;
-			        sample1Count = 0;
-			        wavedone = 0;
-			      }
-			    }
-			    else
-			    {
-			      sample1down = 0;
-			    }
-			    if ( wavedone )
-			    {
-			      voiceptr = &voiceQuicklySleep;
-			      PORTD |=_BV(1); //LED
-			    }
-			    else
-			    {
-			      voiceptr = &voicePlayWave;
-			      PORTD &=~_BV(1); //LED
-			    }
-			    break;
-			  case 8:
-			    //Tuned noise
-			    volume = 100;
-
-			    if (ts) {
-			      speed = 24-ts;
-			    }
-
-			    voiceptr = &voiceTunedNoise;
-			    PORTD &=~_BV(1);
-			    break;
-			  case 9:
-			    //Drum Synths
-			    if (ts) {
-			      volume = 100;
-			      
-			      speed = kit0_speed[ts-1];
-			      fade_out = kit0_fade[ts-1];
-			      fade_out_mode = kit0_drop[ts-1];
-			      PORTD &=~_BV(1);
-			    } else {
-			      PORTD |= _BV(1);
-			    }
-
-			    voiceptr = &voiceDrums;
-			    break;
-			  case 10:
-			    //Drum Synths
-			    if (ts) {
-			      volume = 100;
-
-			      speed = kit1_speed[ts-1];
-			      fade_out = kit1_fade[ts-1];
-			      fade_out_mode = kit1_drop[ts-1];
-			      PORTD &=~_BV(1);
-			    } else {
-			      PORTD |= _BV(1);
-			    }
-
-			    voiceptr = &voiceDrums;
-			    break;
-			  }
-			}
-			else
-			{
-				//No notes
-				voiceptr = voiceQuicklySleep;
-				speed = 0;
-				PORTD |= _BV(1); //LED
-			}
+			//No notes
+			voiceptr = voiceQuicklySleep;
+			speed = 0;
+			PORTD |= _BV(1); //LED
 		}
+		old_mode_button = mode_button;
 	}
 }
 

@@ -42,6 +42,7 @@ uint8_t voicePlayWave();
 uint8_t voiceDoBasicSynth();
 uint8_t voiceNoise();
 uint8_t voiceTunedNoise();
+uint8_t voiceDoSquare();
 uint8_t voiceDrums();
 
 
