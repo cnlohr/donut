@@ -33,6 +33,8 @@ burn : program.hex
 	sudo avrdude -c usbtiny -p $(PROGRAMCODE) -U flash:w:program.hex -F
 
 
+burnall : burn burnfuses
+
 readfuses :
 	sudo avrdude -c usbtiny -p $(PROGRAMCODE) -U hfuse:r:high.txt:b -U lfuse:r:low.txt:b
 
