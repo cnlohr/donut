@@ -45,7 +45,7 @@ readfuses :
 #	sudo avrdude -c usbtiny -p $(PROGRAMCODE) -U lfuse:w:0xE6:m -U hfuse:w:0xDF:m
 
 burnfuses :
-	sudo avrdude -c usbtiny -p $(PROGRAMCODE) -U lfuse:w:0xFF:m -U hfuse:w:0xD6:m -F
+	sudo avrdude -c usbtiny -p $(PROGRAMCODE) -U lfuse:w:0x62:m -U hfuse:w:0xDF:m -F
 
 clean : 
 	rm -f *~ high.txt low.txt program.hex program.map program.elf $(OBJS) *.o usbdrv/*.o usbdrv/*~ program.lst
